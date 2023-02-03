@@ -57,12 +57,11 @@ const getSectorWise = async (sector) => {
     where: {
       company_sector: sector
     },
+    attributes:
+     ['company_id', 'name', 'ceo', 'score'],
     order: [
       ['score', 'DESC']
-    ],
-    attributes: {
-      include: ['company_id', 'name', 'score', 'ceo']
-    }
+    ]
   })
   console.log(sectorData)
   return sectorData
