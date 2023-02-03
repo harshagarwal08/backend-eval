@@ -43,6 +43,39 @@ const saveData = async (urlLink) => {
     }
 
     Company.create(companyData)
+
+    return await Company.findAll({
+      attributes: {
+        include: ['company_id', 'name', 'score']
+      }
+    })
   })
 }
-module.exports = { saveData }
+
+const getSectorWise = async (sector) => {
+  const sectorData = await Company.findAll({
+    where: {
+      company_sector: sector
+    },
+    order: [
+      ['score', 'DESC']
+    ],
+    attributes: {
+      include: ['company_id', 'name', 'score', 'ceo']
+    }
+  })
+  console.log(sectorData)
+  return sectorData
+}
+
+const editCompanyDetails = async (company_id, body) => {
+  return await Company.update({
+    ...body
+  }, {
+    where: {
+      company_id
+    }
+  })
+}
+
+module.exports = { saveData, getSectorWise, editCompanyDetails }

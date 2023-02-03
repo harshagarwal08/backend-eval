@@ -1,5 +1,5 @@
-// const controllers = require('../../src/controllers/company')
-// const services = require('../../src/services/company')
+const controllers = require('../../src/controllers/companyControllers')
+const services = require('../../src/services/companyServices')
 
 describe('creating database', () => {
   it('should fetch the data and create the database', async () => {
@@ -12,7 +12,7 @@ describe('creating database', () => {
       name: 'Company DEF',
       score: 52.45
     }]
-    jest.spyOn('services', services.saveData).mockResolvedValue(data)
+    jest.spyOn(services, 'saveData').mockResolvedValue(data)
 
     const mockReq = {
       body: {
@@ -26,8 +26,44 @@ describe('creating database', () => {
 
     await controllers.saveData(mockReq, mockRes)
 
-    expect(mockRes.status).toBeCalledWith(200)
+    expect(mockRes.status).toBeCalledWith(201)
     expect(mockRes.json).toBeCalledWith(data)
+  })
+  it('should throw an error there is no data', async () => {
+    jest.spyOn(services, 'saveData').mockResolvedValue(null)
+
+    const mockReq = {
+      body: {
+        urlLink: 'http://abc.com'
+      }
+    }
+    const mockRes = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn()
+    }
+
+    await controllers.saveData(mockReq, mockRes)
+
+    expect(mockRes.status).toBeCalledWith(400)
+    expect(mockRes.json).toBeCalledWith({ message: 'Error in saving data' })
+  })
+  it('should throw a server error', async () => {
+    jest.spyOn(services, 'saveData').mockRejectedValue(null)
+
+    const mockReq = {
+      body: {
+        urlLink: 'http://abc.com'
+      }
+    }
+    const mockRes = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn()
+    }
+
+    await controllers.saveData(mockReq, mockRes)
+
+    expect(mockRes.status).toBeCalledWith(500)
+    expect(mockRes.json).toBeCalledWith({ message: 'Internal Server Error' })
   })
 })
 
@@ -44,7 +80,7 @@ describe('get sector wise data', () => {
       ceo: 'Some person name',
       score: 62.45
     }]
-    jest.spyOn('services', services.getSectorWise).mockResolvedValue(data)
+    jest.spyOn(services, 'getSectorWise').mockResolvedValue(data)
 
     const mockReq = {
       query: {
@@ -61,6 +97,43 @@ describe('get sector wise data', () => {
     expect(mockRes.status).toBeCalledWith(200)
     expect(mockRes.json).toBeCalledWith(data)
   })
+
+  it('should throw an error there is no data', async () => {
+    jest.spyOn(services, 'getSectorWise').mockResolvedValue(null)
+
+    const mockReq = {
+      query: {
+        sector: 'abc'
+      }
+    }
+    const mockRes = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn()
+    }
+
+    await controllers.getSectorWise(mockReq, mockRes)
+
+    expect(mockRes.status).toBeCalledWith(400)
+    expect(mockRes.json).toBeCalledWith({ message: 'Error in fetching data' })
+  })
+  it('should throw a server error', async () => {
+    jest.spyOn(services, 'getSectorWise').mockRejectedValue(null)
+
+    const mockReq = {
+      query: {
+        sector: 'abc'
+      }
+    }
+    const mockRes = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn()
+    }
+
+    await controllers.getSectorWise(mockReq, mockRes)
+
+    expect(mockRes.status).toBeCalledWith(500)
+    expect(mockRes.json).toBeCalledWith({ message: 'Internal Server Error' })
+  })
 })
 
 describe('edit company details', () => {
@@ -71,7 +144,7 @@ describe('edit company details', () => {
       ceo: 'Changed name',
       score: 67.45
     }]
-    jest.spyOn('services', services.editCompanyDetails).mockResolvedValue(data)
+    jest.spyOn(services, 'editCompanyDetails').mockResolvedValue(data)
 
     const mockReq = {
       params: {
@@ -90,5 +163,47 @@ describe('edit company details', () => {
 
     expect(mockRes.status).toBeCalledWith(200)
     expect(mockRes.json).toBeCalledWith(data)
+  })
+  it('should throw an error there is no data', async () => {
+    jest.spyOn(services, 'editCompanyDetails').mockResolvedValue(null)
+
+    const mockReq = {
+      params: {
+        company_id: 'ad36a7f5-7630-496e-8628-e70981179668'
+      },
+      body: {
+        ceo: 'Changed name'
+      }
+    }
+    const mockRes = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn()
+    }
+
+    await controllers.editCompanyDetails(mockReq, mockRes)
+
+    expect(mockRes.status).toBeCalledWith(400)
+    expect(mockRes.json).toBeCalledWith({ message: 'Error in fetching data' })
+  })
+  it('should throw a server error', async () => {
+    jest.spyOn(services, 'editCompanyDetails').mockRejectedValue(null)
+
+    const mockReq = {
+      params: {
+        company_id: 'ad36a7f5-7630-496e-8628-e70981179668'
+      },
+      body: {
+        ceo: 'Changed name'
+      }
+    }
+    const mockRes = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn()
+    }
+
+    await controllers.editCompanyDetails(mockReq, mockRes)
+
+    expect(mockRes.status).toBeCalledWith(500)
+    expect(mockRes.json).toBeCalledWith({ message: 'Internal Server Error' })
   })
 })
