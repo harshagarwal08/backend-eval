@@ -6,7 +6,7 @@ const PORT = 3000
 
 app.use(express.json())
 
-const { Router } = require('./src/routes/company')
+const { Router } = require('./src/routes/companyRoutes')
 
 app.use('/api', Router)
 
