@@ -8,7 +8,8 @@ const saveData = async (urlLink) => {
   const response = await axios.get(urlLink, { responseType: 'blob' })
   const file = response.data
   const data = await csvToJson().fromString(file.toString())
-  data.forEach(async (company) => {
+  const allCompanies = []
+  for (const company of data) {
     const { company_id, company_sector } = company
     const getCompanyDetails = await axios.get(`http://54.167.46.10/company/${company_id}`)
     const companyDetails = getCompanyDetails.data
@@ -16,7 +17,7 @@ const saveData = async (urlLink) => {
     `)
 
     const sectorDetails = getSectorDetails.data
-    const data = sectorDetails.find(company_id => company_id)
+    const data = sectorDetails.find(sector => sector.companyId === company_id)
     const scoringData = data.performanceIndex.reduce((acc, scores) => {
       if (scores.key === 'cpi') {
         acc += scores.value * 10
@@ -42,14 +43,15 @@ const saveData = async (urlLink) => {
       score: companyScore
     }
 
-    Company.create(companyData)
+    await Company.create(companyData)
 
-    return await Company.findAll({
-      attributes: {
-        include: ['company_id', 'name', 'score']
-      }
+    const response = await Company.findOne({
+      where: { company_id },
+      attributes: ['company_id', 'name', 'score']
     })
-  })
+    allCompanies.push(response)
+  }
+  return allCompanies
 }
 
 const getSectorWise = async (sector) => {
@@ -63,7 +65,9 @@ const getSectorWise = async (sector) => {
       ['score', 'DESC']
     ]
   })
-  console.log(sectorData)
+  for (const company of sectorData) {
+    company.dataValues.ranking = sectorData.findIndex(data => data.company_id === company.company_id) + 1
+  }
   return sectorData
 }
 
