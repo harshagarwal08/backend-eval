@@ -1,5 +1,79 @@
 const { Company } = require('../../database/models')
 const services = require('../../src/services/companyServices')
+const utils = require('../../src/utils/companyUtils')
+
+describe('save data', () => {
+  it('should save the data', async () => {
+    const data = [{
+      company_id: 'ad36a7f5-7630-496e-8628-e70981179669',
+      company_sector: 'abc'
+    }, {
+      company_id: 'ad36a7f5-7630-496e-8628-e70981179669',
+      company_sector: 'xyz'
+    }]
+    const spied = jest.spyOn(utils, 'getData').mockResolvedValue(data)
+    const spied1 = jest.spyOn(utils, 'getCompanyDetails').mockResolvedValue({ data: { name: 'Company ABC', ceo: 'Some person name' } })
+    const spied2 = jest.spyOn(utils, 'getSectorDetails').mockResolvedValue({
+      data: [{
+        companyId: 'ad36a7f5-7630-496e-8628-e70981179669',
+        performanceIndex: [
+          { name: 'abc', value: 0.5 },
+          { name: 'xyz', value: 0.5 }
+        ]
+      }]
+    })
+    const spied3 = jest.spyOn(utils, 'getScore').mockReturnValue(67.45)
+    const spied4 = jest.spyOn(Company, 'create').mockResolvedValue({
+      company_id: 'ad36a7f5-7630-496e-8628-e70981179669',
+      name: 'Company ABC',
+      ceo: 'Some person name',
+      company_sector: 'abc',
+      score: 67.45
+    })
+    const spied5 = jest.spyOn(Company, 'findOne').mockResolvedValue({
+      company_id: 'ad36a7f5-7630-496e-8628-e70981179669',
+      name: 'Company ABC',
+      score: 67.45
+    })
+    const urlLink = 'https://api.mocki.io/v1/9b9b9b9b'
+    const result = await services.saveData(urlLink)
+
+    expect(spied).toBeCalledWith(urlLink)
+    expect(spied1).toBeCalledWith('ad36a7f5-7630-496e-8628-e70981179669')
+    expect(spied2).toBeCalledWith('abc')
+    expect(spied3).toBeCalledWith({
+      companyId: 'ad36a7f5-7630-496e-8628-e70981179669',
+      performanceIndex: [
+        { name: 'abc', value: 0.5 },
+        { name: 'xyz', value: 0.5 }
+      ]
+
+    })
+    expect(spied4).toBeCalledWith({
+      company_id: 'ad36a7f5-7630-496e-8628-e70981179669',
+      name: 'Company ABC',
+      ceo: 'Some person name',
+      company_sector: 'abc',
+      score: 67.45
+
+    })
+    expect(spied5).toBeCalledWith({
+      where: {
+        company_id: 'ad36a7f5-7630-496e-8628-e70981179669'
+      },
+      attributes: ['company_id', 'name', 'score']
+    })
+    expect(result).toEqual([{
+      company_id: 'ad36a7f5-7630-496e-8628-e70981179669',
+      name: 'Company ABC',
+      score: 67.45
+    }, {
+      company_id: 'ad36a7f5-7630-496e-8628-e70981179669',
+      name: 'Company ABC',
+      score: 67.45
+    }])
+  })
+})
 
 describe('get sector wise companies', () => {
   it('should return the sector wise companies', async () => {
