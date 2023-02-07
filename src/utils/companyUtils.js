@@ -7,9 +7,9 @@ const getData = async (urlLink) => {
   const file = response.data
   return csvToJson().fromString(file.toString())
 }
-const getCompanyDetails = async (company_id) => await axios.get(`http://54.167.46.10/company/${company_id}`)
+const getCompanyDetails = async (company_id) => await axios.get(`http://localhost:4000/company/${company_id}`)
 
-const getSectorDetails = async (company_sector) => await axios.get(`http://54.167.46.10/sector?name=${company_sector}
+const getSectorDetails = async (company_sector) => await axios.get(`http://localhost:4000/sector?name=${company_sector}
 `)
 const getScore = (data) => {
   const score = data.performanceIndex.reduce((acc, scores) => {
