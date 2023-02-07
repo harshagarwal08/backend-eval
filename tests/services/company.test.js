@@ -11,9 +11,9 @@ describe('save data', () => {
       company_id: 'ad36a7f5-7630-496e-8628-e70981179669',
       company_sector: 'xyz'
     }]
-    const spied = jest.spyOn(utils, 'getData').mockResolvedValue(data)
-    const spied1 = jest.spyOn(utils, 'getCompanyDetails').mockResolvedValue({ data: { name: 'Company ABC', ceo: 'Some person name' } })
-    const spied2 = jest.spyOn(utils, 'getSectorDetails').mockResolvedValue({
+    const spiedGetData = jest.spyOn(utils, 'getData').mockResolvedValue(data)
+    const spiedGetCompanyDetails = jest.spyOn(utils, 'getCompanyDetails').mockResolvedValue({ data: { name: 'Company ABC', ceo: 'Some person name' } })
+    const spiedGetSectorDetails = jest.spyOn(utils, 'getSectorDetails').mockResolvedValue({
       data: [{
         companyId: 'ad36a7f5-7630-496e-8628-e70981179669',
         performanceIndex: [
@@ -22,15 +22,15 @@ describe('save data', () => {
         ]
       }]
     })
-    const spied3 = jest.spyOn(utils, 'getScore').mockReturnValue(67.45)
-    const spied4 = jest.spyOn(Company, 'create').mockResolvedValue({
+    const spiedGetScore = jest.spyOn(utils, 'getScore').mockReturnValue(67.45)
+    const spiedCreate = jest.spyOn(Company, 'create').mockResolvedValue({
       company_id: 'ad36a7f5-7630-496e-8628-e70981179669',
       name: 'Company ABC',
       ceo: 'Some person name',
       company_sector: 'abc',
       score: 67.45
     })
-    const spied5 = jest.spyOn(Company, 'findOne').mockResolvedValue({
+    const spiedFindOne = jest.spyOn(Company, 'findOne').mockResolvedValue({
       company_id: 'ad36a7f5-7630-496e-8628-e70981179669',
       name: 'Company ABC',
       score: 67.45
@@ -38,10 +38,10 @@ describe('save data', () => {
     const urlLink = 'https://api.mocki.io/v1/9b9b9b9b'
     const result = await services.saveData(urlLink)
 
-    expect(spied).toBeCalledWith(urlLink)
-    expect(spied1).toBeCalledWith('ad36a7f5-7630-496e-8628-e70981179669')
-    expect(spied2).toBeCalledWith('abc')
-    expect(spied3).toBeCalledWith({
+    expect(spiedGetData).toBeCalledWith(urlLink)
+    expect(spiedGetCompanyDetails).toBeCalledWith('ad36a7f5-7630-496e-8628-e70981179669')
+    expect(spiedGetSectorDetails).toBeCalledWith('abc')
+    expect(spiedGetScore).toBeCalledWith({
       companyId: 'ad36a7f5-7630-496e-8628-e70981179669',
       performanceIndex: [
         { name: 'abc', value: 0.5 },
@@ -49,7 +49,7 @@ describe('save data', () => {
       ]
 
     })
-    expect(spied4).toBeCalledWith({
+    expect(spiedCreate).toBeCalledWith({
       company_id: 'ad36a7f5-7630-496e-8628-e70981179669',
       name: 'Company ABC',
       ceo: 'Some person name',
@@ -57,7 +57,7 @@ describe('save data', () => {
       score: 67.45
 
     })
-    expect(spied5).toBeCalledWith({
+    expect(spiedFindOne).toBeCalledWith({
       where: {
         company_id: 'ad36a7f5-7630-496e-8628-e70981179669'
       },
